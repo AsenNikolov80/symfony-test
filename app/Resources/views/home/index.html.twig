@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12 text-center"><h1>Welcome to our bank!</h1></div>
+            <div class="col-sm-6 block-shadow">
+                <p>Registration will allow you to manage your finances more comfortable</p>
+                <a class="btn btn-info" href="{{ path('register') }}">Register here</a>
+            </div>
+            <div class="col-sm-6 block-shadow">
+                <p>If you have account, proceed with login in your account</p>
+                <a class="btn btn-info" href="{{ path('login') }}">Login here</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

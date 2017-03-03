@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping http://doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+  <entity name="ImportBundle\Entity\BankAccountTransaction" table="bank_account_transactions">
+    <indexes>
+      <index name="bank_account" columns="bank_account"/>
+      <index name="parent_tx" columns="parent_tx"/>
+    </indexes>
+    <id name="id" type="integer" column="id">
+      <generator strategy="IDENTITY"/>
+    </id>
+    <field name="amount" type="decimal" column="amount" precision="10" scale="0" nullable="false"/>
+    <field name="balance" type="decimal" column="balance" precision="10" scale="0" nullable="false"/>
+    <field name="dateCreated" type="datetime" column="date_created" nullable="false"/>
+    <many-to-one field="parentTx" target-entity="BankAccountTransactions" fetch="LAZY">
+      <join-columns>
+        <join-column name="parent_tx" referenced-column-name="id"/>
+      </join-columns>
+    </many-to-one>
+    <many-to-one field="bankAccount" target-entity="BankAccounts" fetch="LAZY">
+      <join-columns>
+        <join-column name="bank_account" referenced-column-name="id"/>
+      </join-columns>
+    </many-to-one>
+  </entity>
+</doctrine-mapping>

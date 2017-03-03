@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12 text-center">
+                {% if flag != '' %}
+                    <h1 class="alert alert-success">{{ flag }}</h1>
+                {% endif %}
+                {% if error != '' %}
+                    <h1 class="alert alert-danger">{{ error }}</h1>
+                {% endif %}
+                <h1>Fill the fields in order to login</h1>
+                {{ form_start(form) }}
+                {{ form_widget(form) }}
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+    <script>
+        $(function(){
+            // remove unused path
+
+        })
+    </script>
+{% endblock %}
+

@@ -2,7 +2,7 @@
 
 namespace AppBundle\Controller;
 
-use AppBundle\Entity\User;
+use ImportBundle\Entity\User;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,11 +17,21 @@ class TestController extends Controller
         return $this->render('test/index.html.twig', ['name' => $name]);
     }
 
-    public function testAction()
+    /**
+     * @Route("/user/add/{username}")
+     */
+    public function testAction($username)
     {
         $em = $this->getDoctrine()->getManager();
-        $em->persist(new User());
-        $em->flush();
+        try {
+            $newUser = new User();
+            $newUser->setUsername($username);
+            $newUser->setDateCreated(new \DateTime());
+            $em->persist($newUser);
+            $em->flush();
+            return $this->render('test/add.html.twig', ['name' => $newUser->getUsername()]);
+        } catch (\Exception $e) {
+            return $this->render('test/add.html.twig', ['name' => 'Something is broken, try with different username']);
+        }
     }
-
 }
