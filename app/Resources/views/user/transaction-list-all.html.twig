@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-3"></div>
+            <div class="col-sm-6">
+                <form method="post" action="{{ path('transactions-all') }}">
+                    <label>Choose account to view:</label>
+                    <select name="accountName" class="form-control">
+                        {% for account in accounts %}
+                            <option value="{{ account.id }}">{{ account.value }}</option>
+                        {% endfor %}
+                    </select>
+                    <button class="btn btn-primary">Continue</button>
+                </form>
+            </div>
+            <div class="col-sm-3"></div>
+        </div>
+    </div>
+{% endblock %}

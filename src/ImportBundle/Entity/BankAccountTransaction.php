@@ -28,14 +28,19 @@ class BankAccountTransaction
     private $id;
 
     /**
-     * @var \ImportBundle\Entity\BankAccountTransactions
+     * @var \ImportBundle\Entity\BankAccountTransaction
      */
     private $parentTx;
 
     /**
-     * @var \ImportBundle\Entity\BankAccounts
+     * @var \ImportBundle\Entity\BankAccount
      */
     private $bankAccount;
+
+    /**
+     * @var \ImportBundle\Entity\BankAccount
+     */
+    private $bankAccountSource;
 
 
     /**
@@ -55,11 +60,11 @@ class BankAccountTransaction
     /**
      * Get amount
      *
-     * @return string
+     * @return float
      */
     public function getAmount()
     {
-        return $this->amount;
+        return (float)$this->amount;
     }
 
     /**
@@ -79,11 +84,11 @@ class BankAccountTransaction
     /**
      * Get balance
      *
-     * @return string
+     * @return float
      */
     public function getBalance()
     {
-        return $this->balance;
+        return (float)$this->balance;
     }
 
     /**
@@ -123,11 +128,11 @@ class BankAccountTransaction
     /**
      * Set parentTx
      *
-     * @param \ImportBundle\Entity\BankAccountTransactions $parentTx
+     * @param \ImportBundle\Entity\BankAccountTransaction $parentTx
      *
      * @return BankAccountTransaction
      */
-    public function setParentTx(\ImportBundle\Entity\BankAccountTransactions $parentTx = null)
+    public function setParentTx(\ImportBundle\Entity\BankAccountTransaction $parentTx = null)
     {
         $this->parentTx = $parentTx;
 
@@ -137,7 +142,7 @@ class BankAccountTransaction
     /**
      * Get parentTx
      *
-     * @return \ImportBundle\Entity\BankAccountTransactions
+     * @return \ImportBundle\Entity\BankAccountTransaction
      */
     public function getParentTx()
     {
@@ -147,11 +152,11 @@ class BankAccountTransaction
     /**
      * Set bankAccount
      *
-     * @param \ImportBundle\Entity\BankAccounts $bankAccount
+     * @param \ImportBundle\Entity\BankAccount $bankAccount
      *
      * @return BankAccountTransaction
      */
-    public function setBankAccount(\ImportBundle\Entity\BankAccounts $bankAccount = null)
+    public function setBankAccount(\ImportBundle\Entity\BankAccount $bankAccount = null)
     {
         $this->bankAccount = $bankAccount;
 
@@ -161,11 +166,27 @@ class BankAccountTransaction
     /**
      * Get bankAccount
      *
-     * @return \ImportBundle\Entity\BankAccounts
+     * @return \ImportBundle\Entity\BankAccount
      */
     public function getBankAccount()
     {
         return $this->bankAccount;
+    }
+
+    /**
+     * @return BankAccount
+     */
+    public function getBankAccountSource()
+    {
+        return $this->bankAccountSource;
+    }
+
+    /**
+     * @param BankAccount $bankAccountSource
+     */
+    public function setBankAccountSource($bankAccountSource)
+    {
+        $this->bankAccountSource = $bankAccountSource;
     }
 }
 

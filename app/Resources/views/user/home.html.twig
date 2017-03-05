@@ -15,7 +15,7 @@
                     <tbody>
                     {% for account in accounts %}
                         <tr>
-                            <td><a href="{{ path('start-transaction',{'name':account.name}) }}"
+                            <td><a href="{{ path('choose-account',{'name':account.name}) }}"
                                    title="Start transaction from this account">{{ account.name }}</a></td>
                             <td>{{ account.balance }}</td>
                             <td>{{ account.modified | date }}</td>

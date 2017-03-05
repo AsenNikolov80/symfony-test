@@ -1,0 +1,126 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        #listTransactions td, #listTransactions th {
+            text-align: center;
+            padding: 10px;
+        }
+
+        #listTransactions td i {
+            cursor: pointer;
+        }
+    </style>
+{% endblock %}
+{% block body %}
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <table class="table table-bordered" id="listTransactions">
+                    <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Account name</th>
+                        <th>Amount</th>
+                        <th>Balance before transaction</th>
+                        <th>Balance after transaction</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for tr in listTransactions %}
+                        <tr>
+                            <td>{{ tr.getBankAccount().getCustomer().getUsername() }}</td>
+                            <td>{{ tr.getBankAccount().getName() }}</td>
+                            <td>{{ tr.getAmount() }}</td>
+                            <td>{{ tr.getBalance() - tr.getAmount() }}</td>
+                            <td>{{ tr.getBalance() }}</td>
+                            <td>{{ tr.getDateCreated() | date }}</td>
+                            <td>
+                                {% if not tr.getParentTx() %}
+                                    <i onclick="refundTransaction()" title="refund this transaction"
+                                       class="fa fa-undo" data-id="{{ tr.getId() }}"></i>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div>
+
+    <div id="dialogRefund" title="Refund transaction"></div>
+    <script>
+        'use strict';
+        function refundTransaction() {
+            console.log($(this));
+            var id = $(this).data('id');
+            var form = $('<form id="refundForm" action="/refund/' + id + '" method="post">');
+            $('<input type="hidden" name="confirm" value="yes"/>').appendTo(form);
+            var message = $('<div>').html('Do you really want to refund this transaction?');
+            message.appendTo(form);
+            $('#dialogRefund').html(form[0].outerHTML);
+            $('#dialogRefund').dialog('open');
+        }
+        function registerEvents() {
+            $(document).off('click', '#listTransactions td i').on('click', '#listTransactions td i', refundTransaction);
+        }
+        $('#dialogRefund').dialog({
+            autoOpen: false,
+            resizable: false,
+            show: {
+                effect: "explode",
+                duration: 1000
+            },
+            hide: {
+                effect: "explode",
+                duration: 1000
+            },
+            width: "300",
+            position: {my: "left top", at: "left+35% top+5%", of: window},
+            modal: true,
+            buttons: {
+                "Refund!": function () {
+                    $('#refundForm').submit();
+                    $(this).dialog("close");
+                },
+                "Cancel": function () {
+                    $(this).dialog("close");
+                }
+            }
+        });
+
+        $(function () {
+            $('#listTransactions').dataTable({
+                responsive: false,
+                "language": {
+                    "search": "Search:",
+                    "emptyTable": "No transactions yet!",
+                    "info": "Transactions: from _START_ to _END_ , from total  _TOTAL_ transactions",
+                    "infoEmpty": "Transactions: from 0 to 0 , from total 0 transactions",
+                    "infoFiltered": "(Filtered from _MAX_ results)",
+                    "lengthMenu": "Show _MENU_ transactions", "loadingRecords": "Loading...",
+                    "processing": "Loading...", "zeroRecords": "No transactions found",
+                    "paginate": {
+                        "first": "First",
+                        "last": "Last",
+                        "next": "Next",
+                        "previous": "Previous"
+                    },
+                    "aria": {
+                        "sortAscending": ": activated sorting",
+                        "sortDescending": ": activated sorting"
+                    }
+                }
+            });
+            registerEvents();
+
+            $('#listTransactions').on('page.dt', registerEvents);
+            $('#listTransactions').on('search.dt', registerEvents);
+        })
+    </script>
+{% endblock %}

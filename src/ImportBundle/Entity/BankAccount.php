@@ -74,11 +74,11 @@ class BankAccount
     /**
      * Get balance
      *
-     * @return string
+     * @return float
      */
     public function getBalance()
     {
-        return $this->balance;
+        return (float)$this->balance;
     }
 
     /**
