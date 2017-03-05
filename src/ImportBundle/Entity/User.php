@@ -11,6 +11,9 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class User implements UserInterface, \Serializable
 {
+    const ROLE_ADMIN = 1;
+    const ROLE_USER = 0;
+
     /**
      * @var string
      * @Assert\NotBlank()
@@ -32,6 +35,12 @@ class User implements UserInterface, \Serializable
      * @Assert\NotBlank()
      */
     private $password;
+
+    /**
+     * @var integer
+     * @Assert\NotBlank()
+     */
+    private $role;
 
     /**
      * Set username
@@ -119,7 +128,11 @@ class User implements UserInterface, \Serializable
 
     public function getRoles()
     {
-        return ['ROLE_USER'];
+        $result = ['ROLE_USER'];
+        if ($this->role == self::ROLE_ADMIN) {
+            $result[] = 'ROLE_ADMIN';
+        }
+        return $result;
     }
 
     public function getSalt()
@@ -130,5 +143,23 @@ class User implements UserInterface, \Serializable
     public function eraseCredentials()
     {
     }
+
+    /**
+     * @return integer
+     */
+    public function getRole()
+    {
+        return (int)$this->role;
+    }
+
+    /**
+     * @param mixed $role
+     */
+    public function setRole($role)
+    {
+        $this->role = $role;
+    }
+
+
 }
 

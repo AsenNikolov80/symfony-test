@@ -23,23 +23,26 @@ class TransactionController extends Controller
      */
     public function refundAction(Request $request, $id)
     {
-        $repoTransactions = $this->getDoctrine()->getRepository(BankAccountTransaction::class);
-        $transaction = $repoTransactions->find($id);
-        $error = null;
-        /* @var $transaction BankAccountTransaction */
-        if ($transaction) {
-            if (!$this->checkForRights($this->getUser(), $transaction->getBankAccount()->getName())) {
-                return $this->redirectToRoute('home');
+        if ($request->request->get('confirm') == 'yes') {
+            $repoTransactions = $this->getDoctrine()->getRepository(BankAccountTransaction::class);
+            $transaction = $repoTransactions->find($id);
+            $error = null;
+            /* @var $transaction BankAccountTransaction */
+            if ($transaction) {
+                if (!$this->checkForRights($this->getUser(), $transaction->getBankAccount()->getName())) {
+                    return $this->redirectToRoute('home');
+                }
+                try {
+                    $this->refundTransaction($transaction);
+                } catch (\Exception $e) {
+                    $error = $e->getMessage();
+                }
+            } else {
+                $error = 'No such transaction found!';
             }
-            try {
-                $this->refundTransaction($transaction);
-            } catch (\Exception $e) {
-                $error = $e->getMessage();
-            }
-        } else {
-            $error = 'No such transaction found!';
+            return $this->render('transaction/refund.html.twig', []);
         }
-        return $this->render('transaction/refund.html.twig', []);
+        return $this->redirectToRoute('home');
     }
 
     /**
