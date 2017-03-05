@@ -28,7 +28,7 @@ class BankAccount
     private $id;
 
     /**
-     * @var \ImportBundle\Entity\Users
+     * @var \ImportBundle\Entity\User
      */
     private $customer;
 
@@ -118,11 +118,11 @@ class BankAccount
     /**
      * Set customer
      *
-     * @param \ImportBundle\Entity\Users $customer
+     * @param \ImportBundle\Entity\User $customer
      *
      * @return BankAccount
      */
-    public function setCustomer(\ImportBundle\Entity\Users $customer = null)
+    public function setCustomer(\ImportBundle\Entity\User $customer = null)
     {
         $this->customer = $customer;
 
@@ -132,7 +132,7 @@ class BankAccount
     /**
      * Get customer
      *
-     * @return \ImportBundle\Entity\Users
+     * @return \ImportBundle\Entity\User
      */
     public function getCustomer()
     {

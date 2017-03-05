@@ -13,8 +13,8 @@
       </options>
     </field>
     <field name="balance" type="decimal" column="balance" precision="10" scale="0" nullable="false"/>
-    <field name="modified" type="date" column="modified" nullable="false"/>
-    <many-to-one field="customer" target-entity="Users" fetch="LAZY">
+    <field name="modified" type="datetime" column="modified" nullable="false"/>
+    <many-to-one field="customer" target-entity="User" fetch="LAZY">
       <join-columns>
         <join-column name="customer_id" referenced-column-name="id"/>
       </join-columns>

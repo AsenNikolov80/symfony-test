@@ -22,8 +22,14 @@ security:
 
         main:
             anonymous: ~
-            http_basic: ~
+#            http_basic: ~
+            form_login:
+                login_path: login
+                check_path: login
             provider: db_provider
+            logout:
+                path:   /logout
+                target: /
             # activate different ways to authenticate
 
             # http_basic: ~
@@ -32,4 +38,7 @@ security:
             # form_login: ~
             # http://symfony.com/doc/current/cookbook/security/form_login_setup.html
     access_control:
-        - { path: ^/admin, roles: ROLE_USER}
+        - { path: ^/admin, roles: ROLE_ADMIN}
+        - { path: ^/account*, roles: IS_AUTHENTICATED_FULLY}
+        - { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/register, roles: IS_AUTHENTICATED_ANONYMOUSLY }

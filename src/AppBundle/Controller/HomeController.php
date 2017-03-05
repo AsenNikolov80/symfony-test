@@ -9,6 +9,7 @@
 namespace AppBundle\Controller;
 
 
+use ImportBundle\Entity\BankAccount;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use ImportBundle\Entity\User;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -25,7 +26,7 @@ use Symfony\Component\Security\Core\Validator\Constraints\UserPassword;
 class HomeController extends Controller
 {
     /**
-     * @Route("/")
+     * @Route("/", name="home")
      */
     public function indexAction()
     {
@@ -37,6 +38,9 @@ class HomeController extends Controller
      */
     public function registerAction(Request $request)
     {
+        if ($this->getUser()) {
+            return $this->redirectToRoute('home');
+        }
         $newUser = new User();
         $form = $this->createFormBuilder($newUser)
             ->add('username', TextType::class, ['attr' => ['class' => 'form-control']])
@@ -51,9 +55,21 @@ class HomeController extends Controller
             $encoder = new BCryptPasswordEncoder(12);
             $passwordHash = $encoder->encodePassword($newUser->getPassword(), '');
             $newUser->setPassword($passwordHash);
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($newUser);
-            $em->flush();
+            try {
+                $newBankAcc = new BankAccount();
+                $newBankAcc->setCustomer($newUser);
+                $newBankAcc->setName($newUser->getUsername());
+                $newBankAcc->setBalance(0);
+                $newBankAcc->setModified(new \DateTime());
+
+                $em = $this->getDoctrine()->getManager();
+                $em->persist($newUser);
+                $em->persist($newBankAcc);
+                $em->flush();
+            } catch (\Exception $e) {
+                return $this->render('home/register.html.twig', ['menuItem' => 'register', 'form' => $form->createView()]);
+            }
+
             return $this->redirectToRoute('login', ['success' => 'You have registered!']);
         }
 
@@ -61,9 +77,9 @@ class HomeController extends Controller
     }
 
     /**
-     * @Route("/login", name="login")
+     * @Route("/login1", name="login1")
      */
-    public function loginAction(Request $request)
+    public function login1Action(Request $request)
     {
         $flagForNewlyRegisteredUser = $request->query->get('success');
         $newUser = new User();
@@ -90,19 +106,50 @@ class HomeController extends Controller
                 if ($encoder->isPasswordValid($passwordHash, $newUser->getPassword(), '')) {
                     // login OK
 //                    $auth = new DaoAuthenticationProvider()
-                    $newUser->serialize();
+
+                    $authenticationUtils = $this->get('security.authentication_utils');
+                    $errors = $authenticationUtils->getLastAuthenticationError();
                 } else {
                     $error = 'Invalid data, please try again!';
                 }
             }
         }
 
-        return $this->render('home/login.html.twig',
+        return $this->render('home/login1.html.twig',
             [
                 'menuItem' => 'login',
                 'flag' => $flagForNewlyRegisteredUser,
                 'form' => $form->createView(),
                 'error' => $error
             ]);
+    }
+
+    /**
+     * @Route("/login", name="login")
+     */
+    public function loginAction(Request $request)
+    {
+        if ($this->getUser()) {
+            return $this->redirectToRoute('home');
+        }
+
+        $flagForNewlyRegisteredUser = $request->query->get('success');
+        $authenticationUtils = $this->get('security.authentication_utils');
+
+        // get the login error if there is one
+        $error = $authenticationUtils->getLastAuthenticationError();
+        $msg = null;
+        if ($error) {
+            $msg = 'Invalid data, please try again!';
+        }
+        // last username entered by the user
+        $lastUsername = $authenticationUtils->getLastUsername();
+
+        return $this->render('home/login.html.twig', [
+            'menuItem' => 'login',
+            'last_username' => $lastUsername,
+            'error' => $msg,
+            'flag' => $flagForNewlyRegisteredUser,
+        ]);
     }
 }

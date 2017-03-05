@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-3"></div>
+            <div class="col-sm-6 text-center">
+                {% if error != '' %}
+                    <div class="alert alert-danger">{{ error }}</div>
+                {% endif %}
+                {% if success != '' %}
+                    <div class="alert alert-success">{{ success }}</div>
+                {% endif %}
+                <h1>Add new bank account</h1>
+                {{ form_start(form) }}
+                {{ form_widget(form) }}
+                {{ form_end(form) }}
+            </div>
+            <div class="col-sm-3"></div>
+        </div>
+    </div>
+{% endblock %}

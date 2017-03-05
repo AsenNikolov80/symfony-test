@@ -2,6 +2,7 @@
 
 namespace ImportBundle\Entity;
 
+use Doctrine\ORM\Event\LifecycleEventArgs;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 

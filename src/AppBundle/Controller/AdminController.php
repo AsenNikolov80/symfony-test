@@ -16,11 +16,11 @@ use Symfony\Component\HttpFoundation\Response;
 class AdminController extends Controller
 {
     /**
-     * @Route("/admin")
+     * @Route("/admin", name="admin")
      */
     public function adminAction()
     {
-        return new Response('<html><body>Admin here</body></html>');
+        return $this->render('admin/home.html.twig', []);
     }
 
 }

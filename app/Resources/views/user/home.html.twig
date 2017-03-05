@@ -1,0 +1,56 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12 text-center">
+                <table class="table table-bordered" id="accounts">
+                    <thead>
+                    <tr>
+                        <th class="text-center">Name</th>
+                        <th class="text-center">Amount</th>
+                        <th class="text-center">Last modified</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for account in accounts %}
+                        <tr>
+                            <td><a href="{{ path('start-transaction',{'name':account.name}) }}"
+                                   title="Start transaction from this account">{{ account.name }}</a></td>
+                            <td>{{ account.balance }}</td>
+                            <td>{{ account.modified | date }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                <a href="{{ path('addAccount') }}" class="btn btn-info">Add new bank account</a>
+            </div>
+        </div>
+    </div>
+    <script>
+        $(function () {
+            $('#accounts').dataTable({
+                responsive: false,
+                "language": {
+                    "search": "Search:",
+                    "emptyTable": "No accounts yet!",
+                    "info": "Results: from _START_ to _END_ , from total  _TOTAL_ results",
+                    "infoEmpty": "Results: from 0 to 0 , from total 0 results",
+                    "infoFiltered": "(Filtered from _MAX_ results)",
+                    "lengthMenu": "Show _MENU_ results", "loadingRecords": "Loading...",
+                    "processing": "Loading...", "zeroRecords": "No results found",
+                    "paginate": {
+                        "first": "First",
+                        "last": "Last",
+                        "next": "Next",
+                        "previous": "Previous"
+                    },
+                    "aria": {
+                        "sortAscending": ": activated sorting",
+                        "sortDescending": ": activated sorting"
+                    }
+                }
+            });
+        })
+    </script>
+{% endblock %}
