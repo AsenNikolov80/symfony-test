@@ -41,6 +41,11 @@
                         {# logged in user menu #}
                         <li class="{{ menuItem is defined and menuItem == 'user'? 'active':'' }}"><a href="{{ path('user') }}">Accounts</a></li>
                         <li class="{{ menuItem is defined and menuItem == 'transactions'? 'active':'' }}"><a href="{{ path('transactions-all') }}">Transactions</a></li>
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <li class="{{ menuItem is defined and menuItem == 'edit-funds'? 'active':'' }}">
+                                <a href="{{ path('edit-funds') }}">Edit funds</a>
+                            </li>
+                        {% endif %}
                         <li class="{{ menuItem is defined and menuItem == 'login'? 'active':'' }}"><a href="{{ path('logout') }}">Logout</a></li>
                     {% endif %}
                 </ul>

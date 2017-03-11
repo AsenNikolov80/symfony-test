@@ -1,0 +1,83 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12 text-center">
+                {% if error is defined and error != '' %}
+                    <div class="alert alert-danger">{{ error }}</div>
+                {% endif %}
+                {% if success is defined and success != '' %}
+                    <div class="alert alert-success">{{ success }}</div>
+                {% endif %}
+                {% if shouldRenderInfo %}
+                    <h1>Bank accounts for user: <strong>{{ user.getUsername() }}</strong></h1>
+                    <table class="table table-bordered" id="accountList">
+                        <thead>
+                        <tr>
+                            <th class="text-center">Account name</th>
+                            <th class="text-center">Amount</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for account in accounts %}
+                            <tr>
+                                <td>{{ account.getName() }}</td>
+                                <td>{{ account.getBalance() }}</td>
+                                <td>
+                                    <form method="post">
+                                        <label>Change amount
+                                            <input class="form-control" type="text" name="amount" value="0"
+                                                   pattern="\d+\.{0,1}\d*"/>
+                                        </label>
+                                        <input type="hidden" name="accountId" value="{{ account.getId() }}">
+                                        <input type="submit" name="action" class="btn btn-primary" value="Add"/>
+                                        <input type="submit" name="action" class="btn btn-warning" value="Remove"/>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <script>
+        'use strict';
+//        function registerEvents() {
+//
+//        }
+
+        $(function () {
+            $('#accountList').dataTable({
+                responsive: false,
+//                "order": [[5, "desc"]],
+                "language": {
+                    "search": "Search:",
+                    "emptyTable": "No accounts yet!",
+                    "info": "Accounts: from _START_ to _END_ , from total  _TOTAL_ accounts",
+                    "infoEmpty": "Accounts: from 0 to 0 , from total 0 accounts",
+                    "infoFiltered": "(Filtered from _MAX_ results)",
+                    "lengthMenu": "Show _MENU_ accounts", "loadingRecords": "Loading...",
+                    "processing": "Loading...", "zeroRecords": "No users found",
+                    "paginate": {
+                        "first": "First",
+                        "last": "Last",
+                        "next": "Next",
+                        "previous": "Previous"
+                    },
+                    "aria": {
+                        "sortAscending": ": activated sorting",
+                        "sortDescending": ": activated sorting"
+                    }
+                }
+            });
+//            registerEvents();
+//
+//            $('#userList').on('page.dt', registerEvents);
+//            $('#userList').on('search.dt', registerEvents);
+        })
+    </script>
+{% endblock %}

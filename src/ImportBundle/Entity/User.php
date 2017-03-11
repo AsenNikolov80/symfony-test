@@ -38,7 +38,6 @@ class User implements UserInterface, \Serializable
 
     /**
      * @var integer
-     * @Assert\NotBlank()
      */
     private $role;
 
@@ -159,7 +158,5 @@ class User implements UserInterface, \Serializable
     {
         $this->role = $role;
     }
-
-
 }
 

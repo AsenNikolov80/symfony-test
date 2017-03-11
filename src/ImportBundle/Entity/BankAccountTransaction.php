@@ -38,9 +38,9 @@ class BankAccountTransaction
     private $bankAccount;
 
     /**
-     * @var \ImportBundle\Entity\BankAccount
+     * @var \ImportBundle\Entity\BankAccountTransaction
      */
-    private $bankAccountSource;
+    private $revertTransaction;
 
 
     /**
@@ -174,19 +174,19 @@ class BankAccountTransaction
     }
 
     /**
-     * @return BankAccount
+     * @return BankAccountTransaction
      */
-    public function getBankAccountSource()
+    public function getRevertTransaction()
     {
-        return $this->bankAccountSource;
+        return $this->revertTransaction;
     }
 
     /**
-     * @param BankAccount $bankAccountSource
+     * @param BankAccountTransaction $revertTransaction
      */
-    public function setBankAccountSource($bankAccountSource)
+    public function setRevertTransaction($revertTransaction)
     {
-        $this->bankAccountSource = $bankAccountSource;
+        $this->revertTransaction = $revertTransaction;
     }
 }
 

@@ -18,6 +18,7 @@ use ImportBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\HttpFoundation\Request;
@@ -70,7 +71,7 @@ class UserController extends Controller
             }
         }
         return $this->render('user/add-bill.html.twig',
-            ['form' => $form->createView(), 'error' => $error, 'success' => $success]);
+            ['form' => $form->createView(), 'error' => $error, 'success' => $success, 'menuItem' => 'transactions']);
     }
 
     /**
@@ -95,9 +96,10 @@ class UserController extends Controller
         foreach ($availableAccounts as $availableAccount) {
             $dropdownFormatAvailableAccounts[$availableAccount->getName()] = $availableAccount->getId();
         }
-        $newTransaction = new BankAccountTransaction();
-        $form = $this->createFormBuilder($newTransaction)
+        $sourceTransaction = new BankAccountTransaction();
+        $form = $this->createFormBuilder($sourceTransaction)
             ->add('amount', TextType::class, ['attr' => ['class' => 'form-control']])
+            ->add('revertTransaction', HiddenType::class)
             ->add('bankAccount', ChoiceType::class, ['choices' => $availableAccounts, 'choice_label' => function ($account) {
                 /* @var $account BankAccount */
                 return $account->getName();
@@ -108,25 +110,34 @@ class UserController extends Controller
         $success = null;
         if ($form->isSubmitted() && $form->isValid()) {
             $oldAmount = $currentAccount->getBalance();
-            /* @var $newTransaction BankAccountTransaction */
-            $newTransaction = $form->getData();
-            $amountOfTransaction = $newTransaction->getAmount();
+            /* @var $sourceTransaction BankAccountTransaction */
+            $sourceTransaction = $form->getData();
+            $amountOfTransaction = $sourceTransaction->getAmount();
             if ($oldAmount >= $amountOfTransaction && $amountOfTransaction > 0) {
 
-                $targetAccount = $newTransaction->getBankAccount();
+                $targetAccount = $sourceTransaction->getBankAccount();
                 $targetAccount->setBalance($targetAccount->getBalance() + $amountOfTransaction);
                 $targetAccount->setModified(new \DateTime());
 
-                $newTransaction->setBalance($targetAccount->getBalance());
-                $newTransaction->setDateCreated(new \DateTime());
-                $newTransaction->setBankAccountSource($currentAccount);
+                $sourceTransaction->setBalance($targetAccount->getBalance());
+                $sourceTransaction->setDateCreated(new \DateTime());
 
                 $currentAccount->setBalance($currentAccount->getBalance() - $amountOfTransaction);
                 $currentAccount->setModified(new \DateTime());
                 $em = $this->getDoctrine()->getManager();
-                $em->persist($newTransaction);
+                $em->persist($sourceTransaction);
                 $em->persist($targetAccount);
+                $answerTransaction = new BankAccountTransaction();
+                $answerTransaction->setAmount(-$amountOfTransaction);
+                $answerTransaction->setBalance($oldAmount - $amountOfTransaction);
+                $answerTransaction->setDateCreated(new \DateTime());
+                $answerTransaction->setBankAccount($currentAccount);
+                $answerTransaction->setParentTx($sourceTransaction);
+
+                $em->persist($answerTransaction);
+                $sourceTransaction->setParentTx($answerTransaction);
                 $em->flush();
+
                 $success = "Successful transaction!";
             } else {
                 $error = 'Not enough money!';
@@ -139,7 +150,8 @@ class UserController extends Controller
                 'form' => $form->createView(),
                 'amount' => $currentAccount->getBalance(),
                 'error' => $error,
-                'success' => $success
+                'success' => $success,
+                'menuItem' => 'transactions'
             ]);
     }
 
@@ -160,7 +172,8 @@ class UserController extends Controller
                 $error = 'No such user found!';
             }
         }
-        return $this->render('user/choose-user.html.twig', ['name' => $name, 'error' => $error]);
+        return $this->render('user/choose-user.html.twig',
+            ['name' => $name, 'error' => $error]);
     }
 
     /**
@@ -176,9 +189,22 @@ class UserController extends Controller
             return $this->redirectToRoute('home');
         }
 
+        /* @var $repoTransactions EntityRepository */
+        $revertedTransactionIdsArray = $repoTransactions->createQueryBuilder('t')
+            ->where('t.revertTransaction IS NOT NULL')->getQuery()->getResult();
+        $revertedTransactionIds = [];
+        foreach ($revertedTransactionIdsArray as $item) {
+            /* @var $item BankAccountTransaction */
+            $revertedTransactionIds[] = $item->getRevertTransaction()->getId();
+        }
         // get transactions for current account
-        $listTransactions = $repoTransactions->findBy(['bankAccount' => $account->getId()]);
-        return $this->render('user/transaction-list.html.twig', ['listTransactions' => $listTransactions]);
+        $listTransactions = $repoTransactions->findBy(['bankAccount' => $account->getId()], ['dateCreated' => 'DESC']);
+        return $this->render('user/transaction-list.html.twig',
+            [
+                'listTransactions' => $listTransactions,
+                'revertedTransactionIds' => $revertedTransactionIds,
+                'menuItem' => 'transactions'
+            ]);
     }
 
     /**
@@ -201,8 +227,9 @@ class UserController extends Controller
             /* @var $item BankAccount */
             $accounts[] = ['id' => $item->getId(), 'value' => $item->getName()];
         }
-        $menuItems = 'transactions';
-        return $this->render('user/transaction-list-all.html.twig', ['accounts' => $accounts, 'menuItems' => $menuItems]);
+        $menuItem = 'transactions';
+        return $this->render('user/transaction-list-all.html.twig',
+            ['accounts' => $accounts, 'menuItem' => $menuItem]);
     }
 
     private function getBankAccountsByUser($userId, $excludedAccountName = null)

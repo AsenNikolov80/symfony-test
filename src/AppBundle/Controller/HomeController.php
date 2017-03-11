@@ -49,12 +49,20 @@ class HomeController extends Controller
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
+            /* @var $newUser User */
             $newUser = $form->getData();
+            $repoUsers = $this->getDoctrine()->getRepository(User::class);
+            $isExistsUser = $repoUsers->findOneBy(['username' => $newUser->getUsername()]);
+            if ($isExistsUser) {
+                return $this->render('home/register.html.twig',
+                    ['menuItem' => 'register', 'form' => $form->createView(), 'error' => 'Username already exists, please choose another one!']);
+            }
             /* @var $newUser User */
             $newUser->setDateCreated(new \DateTime());
             $encoder = new BCryptPasswordEncoder(12);
             $passwordHash = $encoder->encodePassword($newUser->getPassword(), '');
             $newUser->setPassword($passwordHash);
+            $newUser->setRole(User::ROLE_USER);
             try {
                 $newBankAcc = new BankAccount();
                 $newBankAcc->setCustomer($newUser);

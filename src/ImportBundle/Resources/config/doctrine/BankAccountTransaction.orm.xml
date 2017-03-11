@@ -3,7 +3,7 @@
   <entity name="ImportBundle\Entity\BankAccountTransaction" table="bank_account_transactions">
     <indexes>
       <index name="bank_account" columns="bank_account"/>
-      <index name="bank_account_source" columns="bank_account_source"/>
+      <index name="revert_transaction" columns="revert_transaction"/>
       <index name="parent_tx" columns="parent_tx"/>
     </indexes>
     <id name="id" type="integer" column="id">
@@ -22,9 +22,9 @@
         <join-column name="bank_account" referenced-column-name="id"/>
       </join-columns>
     </many-to-one>
-    <many-to-one field="bankAccountSource" target-entity="BankAccount" fetch="LAZY">
+    <many-to-one field="revertTransaction" target-entity="BankAccountTransaction" fetch="LAZY">
       <join-columns>
-        <join-column name="bank_account_source" referenced-column-name="id"/>
+        <join-column name="revert_transaction" referenced-column-name="id"/>
       </join-columns>
     </many-to-one>
   </entity>

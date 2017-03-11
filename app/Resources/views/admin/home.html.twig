@@ -4,8 +4,59 @@
     <div class="container">
         <div class="row">
             <div class="col-sm-12 text-center">
-
+                <table class="table table-bordered" id="userList">
+                    <thead>
+                    <tr>
+                        <th class="text-center">Username</th>
+                        <th class="text-center">Date created</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for user in users %}
+                        <tr>
+                            <td><a href="{{ path('edit-user', {'id': user.getId()}) }}">{{ user.getUsername() }}</a></td>
+                            <td>{{ user.getDateCreated() | date }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
+    <script>
+        'use strict';
+//        function registerEvents() {
+//
+//        }
+
+        $(function () {
+            $('#userList').dataTable({
+                responsive: false,
+//                "order": [[5, "desc"]],
+                "language": {
+                    "search": "Search:",
+                    "emptyTable": "No users yet!",
+                    "info": "Users: from _START_ to _END_ , from total  _TOTAL_ users",
+                    "infoEmpty": "Users: from 0 to 0 , from total 0 users",
+                    "infoFiltered": "(Filtered from _MAX_ results)",
+                    "lengthMenu": "Show _MENU_ users", "loadingRecords": "Loading...",
+                    "processing": "Loading...", "zeroRecords": "No users found",
+                    "paginate": {
+                        "first": "First",
+                        "last": "Last",
+                        "next": "Next",
+                        "previous": "Previous"
+                    },
+                    "aria": {
+                        "sortAscending": ": activated sorting",
+                        "sortDescending": ": activated sorting"
+                    }
+                }
+            });
+//            registerEvents();
+//
+//            $('#userList').on('page.dt', registerEvents);
+//            $('#userList').on('search.dt', registerEvents);
+        })
+    </script>
 {% endblock %}

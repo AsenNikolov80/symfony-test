@@ -32,18 +32,26 @@
                     <tbody>
                     {% for tr in listTransactions %}
                         <tr>
-                            <td>{{ tr.getBankAccount().getCustomer().getUsername() }}</td>
-                            <td>{{ tr.getBankAccount().getName() }}</td>
-                            <td>{{ tr.getAmount() }}</td>
-                            <td>{{ tr.getBalance() - tr.getAmount() }}</td>
+                            <td>
+                                {{ tr.getParentTx().getBankAccount().getCustomer().getUsername() }}
+                            </td>
+                            <td>
+                                {{ tr.getParentTx().getBankAccount().getName() }}
+                            </td>
+                            <td>
+                                {{ tr.getAmount() }}
+                            </td>
+                            <td>
+                                {{ tr.getBalance() - tr.getAmount() }}
+                            </td>
                             <td>{{ tr.getBalance() }}</td>
                             <td>{{ tr.getDateCreated() | date }}</td>
                             <td>
-                                {% if not tr.getParentTx() %}
+                                {% if tr.getRevertTransaction() %}
+                                    Refunded
+                                {% elseif(tr.getAmount() > 0) %}
                                     <i onclick="refundTransaction()" title="refund this transaction"
                                        class="fa fa-undo" data-id="{{ tr.getId() }}"></i>
-                                {% else %}
-                                    Refunded
                                 {% endif %}
                             </td>
                         </tr>
@@ -99,6 +107,7 @@
         $(function () {
             $('#listTransactions').dataTable({
                 responsive: false,
+                "order": [[5, "desc"]],
                 "language": {
                     "search": "Search:",
                     "emptyTable": "No transactions yet!",

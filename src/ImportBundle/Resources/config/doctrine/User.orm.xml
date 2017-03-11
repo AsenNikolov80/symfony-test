@@ -17,7 +17,7 @@
         <option name="fixed"/>
       </options>
     </field>
-    <field name="dateCreated" type="date" column="date_created" nullable="false"/>
+    <field name="dateCreated" type="datetime" column="date_created" nullable="false"/>
     <field name="role" type="integer" column="role" nullable="false"/>
   </entity>
 </doctrine-mapping>
